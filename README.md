@@ -25,6 +25,22 @@ yarn add -D prettier eslint-config-prettier eslint-plugin-prettier
 # if using other package managers
 npx expo install -- --save-dev prettier eslint-config-prettier eslint-plugin-prettier
 ```
-```bash
+Then, to integrate Prettier with ESlint, update your `.eslintrc.js` as follows
+```javascript
+module.exports = {
+  extends: ['expo', 'prettier'],
+  plugins: ['prettier'],
+  rules: {
+    'prettier/prettier': 'error',
+  },
+};
+```
 
+for codespace use this command to access your app.
+```bash
+npx expo start --tunnel
+```
+
+```bash
+npx expo install expo-font
 ```
