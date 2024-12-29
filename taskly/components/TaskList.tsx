@@ -1,60 +1,72 @@
 import React from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  StyleSheet,
+  Platform,
+} from 'react-native';
 import { Task } from '../types/task';
-import { theme, textStyles, icons } from '../theme';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { theme, textStyles } from '../theme';
+import { useTaskStore } from '../store/taskStore';
 
-interface TaskListProps {
-  tasks: Task[];
-  onToggleTask: (id: string) => void;
-}
+export function TaskList() {
+  const { tasks, toggleTask } = useTaskStore();
 
-export function TaskList({ tasks, onToggleTask }: TaskListProps) {
+  const renderItem = ({ item }: { item: Task }) => (
+    <TouchableOpacity
+      style={styles.taskItem}
+      onPress={() => toggleTask(item.id)}
+    >
+      <Text style={[styles.taskText, item.completed && styles.completedText]}>
+        {item.title}
+      </Text>
+    </TouchableOpacity>
+  );
+
   return (
     <FlatList
       data={tasks}
       keyExtractor={(item) => item.id}
-      renderItem={({ item }) => (
-        <TouchableOpacity 
-          style={styles.taskItem} 
-          onPress={() => onToggleTask(item.id)}
-        >
-          <MaterialCommunityIcons 
-            name={item.completed ? icons.names.check : icons.names.uncheck}
-            size={icons.size.medium}
-            color={item.completed ? theme.colors.success : theme.colors.grey.medium}
-          />
-          <Text style={[
-            styles.taskText,
-            item.completed && styles.completedTask
-          ]}>
-            {item.title}
-          </Text>
-        </TouchableOpacity>
-      )}
-      contentContainerStyle={styles.listContainer}
+      renderItem={renderItem}
+      style={styles.list}
+      contentContainerStyle={tasks.length ? styles.listContainer : styles.emptyContainer}
+      ListEmptyComponent={<Text style={styles.emptyText}>No tasks yet!</Text>}
     />
   );
 }
 
 const styles = StyleSheet.create({
+  list: {
+    flex: 1,
+    width: '100%',
+  },
   listContainer: {
-    gap: theme.spacing.sm,
+    paddingVertical: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.md,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyText: {
+    ...textStyles.body,
+    color: theme.colors.grey.dark,
   },
   taskItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: theme.spacing.sm,
-    backgroundColor: theme.colors.white,
-    padding: theme.spacing.md,
-    borderRadius: theme.borderRadius.md,
-    ...theme.shadows.small,
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
   },
   taskText: {
-    ...textStyles.body,
+    fontSize: 16,
+    fontFamily: 'Ubuntu',
+    color: '#000',
   },
-  completedTask: {
+  completedText: {
     textDecorationLine: 'line-through',
-    color: theme.colors.grey.medium,
+    color: '#999',
   },
 });
